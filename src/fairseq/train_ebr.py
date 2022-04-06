@@ -199,7 +199,7 @@ def run_eval_bleu(epoch, data_iter, model, field_names):
     for i, batch in enumerate(data_iter):
         hypo_scores = torch.stack([model(getattr(batch, field).cuda()) for field in field_names[1:1 + sample_count]]).view(sample_count, -1).t() 
         target_texts = getattr(batch, 'target')
-        _, max_idx = torch.max(hypo_scores, 1)
+        _, max_idx = torch.min(hypo_scores, 1)
         hypo_texts = [getattr(batch, 'hypo_' + str(idx.item()))[it].tolist() for it, idx in enumerate(max_idx)]
         hypo_sents = get_sent_from_tensor(hypo_texts)
         target_sents = get_sent_from_tensor(target_texts.tolist())
@@ -237,7 +237,7 @@ def conditional_run_eval_bleu(epoch, data_iter, model, field_names):
     for i, batch in enumerate(data_iter):
         hypo_scores = torch.stack([model(getattr(batch, field).cuda()) for field in field_names[1:1 + sample_count]]).view(sample_count, -1).t() 
         target_texts = getattr(batch, 'target')
-        _, max_idx = torch.max(hypo_scores, 1)
+        _, max_idx = torch.min(hypo_scores, 1)
         for it, idx in enumerate(max_idx):
             hypo_texts=[getattr(batch, 'hypo_' + str(idx.item()))[it].tolist()]
             hypo_sent=bert_tokenizer.convert_tokens_to_string(bert_tokenizer.convert_ids_to_tokens(hypo_texts[0],skip_special_tokens = False))        
